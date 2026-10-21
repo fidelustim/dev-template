@@ -18,3 +18,12 @@
 Типы: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`.
 
 Пример: `feat(auth): вход по токену [PROJ-14]`
+
+## Контроль соблюдения процесса
+
+Два барьера (подробности — ADR-0002):
+
+1. **Хук `pre-push`** на сервере агентов (`~/.git-hooks/pre-push`, версия в `scripts/pre-push`). Прямой `git push` в `main`/`develop` отклоняется. Осознанный обход — только для релиза: `ALLOW_PROTECTED_PUSH=1 git push`.
+2. **Workflow `Guard (gitflow)`** — если прямой пуш всё же прошёл (например, с другой машины), пуш помечается красным в Actions.
+
+Бесплатный план GitHub не даёт branch protection на приватных репозиториях. Когда появится GitHub Pro — включить защиту: `scripts/setup-branch-protection.sh`.
