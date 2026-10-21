@@ -1,7 +1,9 @@
 # ADR-0002: Как обеспечиваем gitflow без платного плана GitHub
 
+> **Заменено [ADR-0003](0003-public-repo-native-rules.md).** Хук и guard-workflow удалены: репозиторий публичный, работает нативная защита веток.
+
 - **Дата:** 2026-10-21
-- **Статус:** принято
+- **Статус:** заменено ADR-0003
 - **Контекст:** нужен технический запрет на прямые коммиты в `main` и `develop`. GitHub не даёт ни branch protection, ни rulesets для приватных репозиториев на бесплатном плане (HTTP 403: «Upgrade to GitHub Pro or make this repository public»).
 
 ## Решение
