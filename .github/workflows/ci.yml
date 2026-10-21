@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint & tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect stack
+        id: detect
+        run: |
+          if [ -f pyproject.toml ] || [ -f requirements.txt ]; then echo "python=true" >> "$GITHUB_OUTPUT"; fi
+          if [ -f package.json ]; then echo "node=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Set up Python
+        if: steps.detect.outputs.python == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        if: steps.detect.outputs.python == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install ruff pytest
+
+      - name: Python lint
+        if: steps.detect.outputs.python == 'true'
+        run: ruff check .
+
+      - name: Python tests
+        if: steps.detect.outputs.python == 'true'
+        run: pytest -q
+
+      - name: Set up Node
+        if: steps.detect.outputs.node == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Node deps
+        if: steps.detect.outputs.node == 'true'
+        run: npm ci || npm install
+
+      - name: Node tests
+        if: steps.detect.outputs.node == 'true'
+        run: npm test --if-present
